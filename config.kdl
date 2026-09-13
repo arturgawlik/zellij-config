@@ -4,7 +4,27 @@
 
 keybinds clear-defaults=true {
     locked {
-        bind "Ctrl g" { SwitchToMode "normal"; }
+        bind "Ctrl g" { 
+            SwitchToMode "normal"; 
+            // added by me - so bottom bar is hidden
+            ToggleFocusFullscreen
+        } 
+    }
+    // added by me
+    // some bindings that always should be avaialble
+    shared {
+        bind "Ctrl p" {
+            LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-tab-picker.wasm" {
+                floating true
+                title "Pick the tab"
+            }
+            // LaunchOrFocusPlugin "file:~/.config/zellij/plugins/room.wasm" {
+            //     floating true
+            //     ignore_case true
+            //     quick_jump true
+            // }
+        }
+        bind "Ctrl Alt f" { ToggleFocusNoUiFullscreen; SwitchToMode "locked"; }
     }
     pane {
         bind "left" { MoveFocus "left"; }
@@ -16,7 +36,7 @@ keybinds clear-defaults=true {
         bind "d" { NewPane "down"; SwitchToMode "normal"; }
         bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
-        bind "Shift f" { ToggleFocusNoUiFullscreen; SwitchToMode "normal"; }
+        // bind "Shift f" { ToggleFocusNoUiFullscreen; SwitchToMode "normal"; }
         bind "h" { MoveFocus "left"; }
         bind "i" { TogglePanePinned; SwitchToMode "normal"; }
         bind "j" { MoveFocus "down"; }
@@ -24,7 +44,7 @@ keybinds clear-defaults=true {
         bind "l" { MoveFocus "right"; }
         bind "n" { NewPane; SwitchToMode "normal"; }
         bind "p" { SwitchFocus; }
-        bind "Ctrl p" { SwitchToMode "normal"; }
+        bind "Ctrl a" { SwitchToMode "normal"; }
         bind "r" { NewPane "right"; SwitchToMode "normal"; }
         bind "s" { NewPane "stacked"; SwitchToMode "normal"; }
         bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
@@ -165,21 +185,24 @@ keybinds clear-defaults=true {
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
         bind "Alt f" { ToggleFloatingPanes; }
-        bind "Ctrl g" { SwitchToMode "locked"; }
+        bind "Ctrl g" { 
+            SwitchToMode "locked"; 
+            
+            // added be my - when going to "locked"
+            // then go to my zen layout 
+            // OverrideLayout {
+            //     layout "./layouts/zen.kdl"
+            //     retain_existing_terminal_panes true
+            // }
+            // ToggleFocusFullscreen
+            // ToggleFocusNoUiFullscreen
+        }
         bind "Alt i" { MoveTab "left"; }
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
         bind "Alt p" { TogglePaneInGroup; }
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Ctrl q" { Quit; }
-
-        bind "Ctrl y" {
-            LaunchOrFocusPlugin "file:~/.config/zellij/plugins/room.wasm" {
-                floating true
-                ignore_case true
-                quick_jump true
-            }
-        }
     }
     shared_except "locked" "move" {
         bind "Ctrl h" { SwitchToMode "move"; }
@@ -207,7 +230,7 @@ keybinds clear-defaults=true {
         bind "Ctrl t" { SwitchToMode "tab"; }
     }
     shared_except "locked" "pane" {
-        bind "Ctrl p" { SwitchToMode "pane"; }
+        bind "Ctrl a" { SwitchToMode "pane"; }
     }
     shared_except "locked" "resize" {
         bind "Ctrl n" { SwitchToMode "resize"; }
@@ -280,16 +303,6 @@ keybinds clear-defaults=true {
         bind "p" { GoToPreviousTab; SwitchToMode "normal"; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
     }
-    shared_except "locked" {
-        bind "Ctrl y" {
-            LaunchOrFocusPlugin "file:~/.config/zellij/plugins/room.wasm" {
-                floating true
-                ignore_case true
-                quick_jump true
-            }
-        }
-    }
-    
 }
 
 // Plugin aliases - can be used to change the implementation of Zellij
@@ -312,7 +325,13 @@ plugins {
 
     // my plugins
     // zellij-datetime location="https://github.com/h1romas4/zellij-datetime/releases/download/v0.22.0/zellij-datetime.wasm"
-    room location="https://github.com/rvcas/room/releases/download/v1.2.1/room.wasm"
+    // room location="file:~/.config/zellij/plugins/room.wasm"
+
+    // Headless half of the tab picker: when you leave fullscreen in one tab, it
+    // leaves fullscreen in every tab the picker took you to. Loaded below.
+    tab-picker-watcher location="file:~/.config/zellij/plugins/zellij-tab-picker.wasm" {
+        watcher true
+    }
 }
 
 // Plugins to load in the background when a new session starts
@@ -320,6 +339,7 @@ plugins {
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
     zellij:link
+    tab-picker-watcher
     // zellij-datetime 
 }
 web_client {
@@ -381,6 +401,7 @@ theme_light "catppuccin-latte"
 // Default: "default"
 // 
 // default_layout "compact"
+// default_layout "tabs-up"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)
@@ -406,7 +427,7 @@ theme_light "catppuccin-latte"
 //   - true (default, enabled)
 //   - false
 // 
-// pane_frames true
+// pane_frames false
  
 // Set the pane frame style when pane_frames is enabled
 // Options:
