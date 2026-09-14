@@ -7,7 +7,7 @@ keybinds clear-defaults=true {
         bind "Ctrl g" { 
             SwitchToMode "normal"; 
             // added by me - so bottom bar is hidden
-            ToggleFocusFullscreen
+            // ToggleFocusFullscreen
         } 
     }
     // added by me
